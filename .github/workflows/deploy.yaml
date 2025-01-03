@@ -1,0 +1,45 @@
+name: Publish Site
+
+on:
+  push:
+    branches:
+      - main # Рабочий процесс срабатывает при пуше в ветку main
+  workflow_dispatch: # Позволяет запускать вручную с вкладки Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Шаг 1: Извлечение содержимого репозитория
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Шаг 2: Установка Pandoc
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      # Шаг 3: Конвертация Markdown в HTML
+      - name: Generate HTML
+        run: |
+          mkdir public
+          pandoc main.md -o public/index.html
+          echo "HTML file generated"
+
+      # Шаг 4: Загрузка статических файлов как артефактов
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write # Требуется для публикации на GitHub Pages
+      id-token: write # Требуется для аутентификации
+    steps:
+      # Шаг 5: Развертывание артефактов
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
