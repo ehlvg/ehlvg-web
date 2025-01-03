@@ -24,7 +24,7 @@ jobs:
       - name: Generate HTML
         run: |
           mkdir public
-          pandoc main.md -o public/index.html
+          pandoc README.md -o public/index.html
           echo "HTML file generated"
 
       # Шаг 4: Загрузка статических файлов как артефактов
